@@ -76,6 +76,10 @@ public class SecurityConfig {
                         .key("uniqueAndSecret")
                         .tokenValiditySeconds(86400)
                         .rememberMeParameter("remember-me")
+                )
+                // CSRF: KHÔNG ignore /register (để buộc phải có token)
+                .csrf(csrf -> csrf
+                        .ignoringRequestMatchers("/api/**") // nếu có API thuần JSON
                 );
 
         return http.build();

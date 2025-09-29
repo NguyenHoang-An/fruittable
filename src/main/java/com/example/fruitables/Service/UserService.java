@@ -42,18 +42,29 @@ public class UserService implements UserDetailsService {
 
     // Đăng ký người dùng mới: validate, mã hoá mật khẩu, gán quyền, lưu DB
     public void register(String fullname, String email, String username, String rawPassword) {
-        if (repo.existsByUsername(username)) throw new IllegalArgumentException("Username already exists");
-        if (repo.existsByEmail(email)) throw new IllegalArgumentException("Email already exists");
+        System.out.println(">> [REGISTER] Request username=" + username + ", email=" + email);
+
+        if (repo.existsByUsername(username)) {
+            System.out.println(">> [REGISTER] Duplicate username: " + username);
+            throw new IllegalArgumentException("Username already exists: " + username);
+        }
+        if (repo.existsByEmail(email)) {
+            System.out.println(">> [REGISTER] Duplicate email: " + email);
+            throw new IllegalArgumentException("Email already exists: " + email);
+        }
 
         User u = new User();
         u.setFullname(fullname);
         u.setEmail(email);
         u.setUsername(username);
         u.setPassword(encoder.encode(rawPassword));
+
+        // Sửa đúng chuẩn ROLE_
         u.setRoles(Set.of("ROLE_USER"));
-        // Lưu user vào MongoDB
-        repo.save(u);
-        // Ghi log đơn giản để theo dõi (có thể xem trên console)
-        System.out.println("[REGISTER] Created user: " + u.getUsername() + " (" + u.getEmail() + ")");
+
+        User saved = repo.save(u);
+        System.out.println(">> [REGISTER] Created user id=" + saved.getId()
+                + ", username=" + saved.getUsername() + ", email=" + saved.getEmail());
     }
+
 }

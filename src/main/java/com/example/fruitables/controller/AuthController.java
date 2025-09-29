@@ -26,18 +26,23 @@ public class AuthController {
 
     // Trang đăng ký (GET)
     @GetMapping("/register")
-    public String registerPage(){
+    public String registerPage(Model model){
+        model.addAttribute("registerDto", new RegisterDto());
         return "register";
     }
 
     // Xử lý submit đăng ký (POST)
     @PostMapping("/register")
-    public String doRegister(@Valid @ModelAttribute User user, BindingResult result, Model model) {
+    public String doRegister(@Valid @ModelAttribute ("registerDto") RegisterDto registerDto, BindingResult result, Model model) {
         if (result.hasErrors()) {
             return "register";
         }
+        if(!registerDto.getPassword().equals(registerDto.getConfirm())){
+            model.addAttribute("error", "Passwords do not match");
+            return "register";
+        }
         try {
-            userService.register(user.getFullname(), user.getEmail(), user.getUsername(), user.getPassword());
+            userService.register(registerDto.getFullname(), registerDto.getEmail(), registerDto.getUsername(), registerDto.getPassword());
             return "redirect:/login?registered";
         } catch (IllegalArgumentException ex) {
             model.addAttribute("error", ex.getMessage());
