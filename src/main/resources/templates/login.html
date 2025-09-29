@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login - Fruitables</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/style.css" rel="stylesheet">
+</head>
+<body>
+<!-- Section: Login -->
+<div class="container-fluid py-5 bg-light">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-7 col-lg-5">
+                <div class="card shadow-lg border-0 rounded-4">
+                    <div class="card-body p-4 p-md-5">
+                        <h3 class="text-center text-primary mb-4">Welcome back</h3>
+                        <p class="text-center text-muted mb-4">Please sign in to continue</p>
+                        <!-- Hiển thị thông báo dựa trên query param của Spring Security -->
+                        <div th:if="${param.registered}" class="alert alert-success rounded-3" role="alert">
+                            Account created successfully. Please sign in.
+                        </div>
+                        <div th:if="${param.error}" class="alert alert-danger rounded-3" role="alert">
+                            Invalid username or password.
+                        </div>
+                        <div th:if="${param.logout}" class="alert alert-info rounded-3" role="alert">
+                            You have been logged out.
+                        </div>
+
+                        <form action="/login" method="post">
+                            <div class="form-group mb-3">
+                                <label for="username" class="form-label">Username or Email</label>
+                                <input type="text" class="form-control form-control-lg" id="username" name="username" placeholder="Enter username/email" required>
+                            </div>
+                            <div class="form-group mb-3">
+                                <label for="password" class="form-label">Password</label>
+                                <input type="password" class="form-control form-control-lg" id="password" name="password" placeholder="Enter password" required>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input" id="remember" name="remember-me">
+                                    <label class="form-check-label" for="remember">Remember me</label>
+                                </div>
+                                <a href="#" class="text-decoration-none">Forgot password?</a>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-lg w-100 rounded-pill">Login</button>
+                        </form>
+                        <p class="text-center mt-4 mb-0">Don't have an account?
+                            <a href="/register" class="text-primary fw-bold">Create one</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/js/main.js"></script>
+</body>
+</html>
