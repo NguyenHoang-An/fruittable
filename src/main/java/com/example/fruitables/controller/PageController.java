@@ -24,12 +24,6 @@ public class PageController {
         return "shop-detail";
     }
 
-    // Trang giỏ hàng
-    @GetMapping({"/cart"})
-    public String cart(){
-        return "cart";
-    }
-
     // Trang thanh toán
     @GetMapping({"/chackout"})
     public String chackout(){
