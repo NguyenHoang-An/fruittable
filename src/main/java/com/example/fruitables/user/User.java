@@ -1,8 +1,11 @@
 package com.example.fruitables.user;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.time.Instant;
 import java.util.*;
 // Entity MongoDB lưu trong collection "users"
 @Document(collection = "users")
@@ -18,8 +21,12 @@ public class User {
     private String email;
     @Size(min = 8, message = "Password must be at least a characters")
     private String password;
+    private String phone;
+    private String address;
+    private String avatarUrl;
     private boolean enabled = true; // bật/tắt tài khoản
     private Set<String> roles; // danh sách quyền (ROLE_*)
+
 
     public User() {}
 
@@ -84,5 +91,29 @@ public class User {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getAvatarUrl() {
+        return avatarUrl;
+    }
+
+    public void setAvatarUrl(String avatarUrl) {
+        this.avatarUrl = avatarUrl;
     }
 }

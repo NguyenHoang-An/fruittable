@@ -23,6 +23,10 @@ public class RegisterDto {
     @NotBlank(message = "Confirm password is required")
     private String confirm;
 
+    private String phone;
+    private String address;
+    private String avatarUrl;
+
     //getters, setters
 
     public String getFullname() {
@@ -63,5 +67,29 @@ public class RegisterDto {
 
     public void setConfirm(String confirm) {
         this.confirm = confirm;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getAvatarUrl() {
+        return avatarUrl;
+    }
+
+    public void setAvatarUrl(String avatarUrl) {
+        this.avatarUrl = avatarUrl;
     }
 }
