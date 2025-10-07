@@ -1,12 +1,12 @@
 package com.example.fruitables.user;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.time.Instant;
+import java.time.LocalDate;
 import java.util.*;
+
 // Entity MongoDB lưu trong collection "users"
 @Document(collection = "users")
 public class User {
@@ -26,6 +26,8 @@ public class User {
     private String avatarUrl;
     private boolean enabled = true; // bật/tắt tài khoản
     private Set<String> roles; // danh sách quyền (ROLE_*)
+    private String gender;
+    private LocalDate dob; // date of birth
 
 
     public User() {}
@@ -115,5 +117,21 @@ public class User {
 
     public void setAvatarUrl(String avatarUrl) {
         this.avatarUrl = avatarUrl;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    public LocalDate getDob() {
+        return dob;
+    }
+
+    public void setDob(LocalDate dob) {
+        this.dob = dob;
     }
 }

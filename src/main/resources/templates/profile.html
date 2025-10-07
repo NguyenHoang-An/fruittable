@@ -160,8 +160,8 @@
                     <div class="tab-pane fade" id="account-pane">
                         <div class="row g-4 align-items-start">
                             <div class="col-md-3 text-center">
-                                <img th:src="${user != null && user.avatarUrl != null ? user.avatarUrl : '/img/avatar.jpg'}"
-                                     alt="Ảnh đại diện" class="avatar">
+                                <img th:src="${#strings.isEmpty(user.avatarUrl) ? '/img/avatar.png' : user.avatarUrl}"
+                                     alt="Ảnh đại diện" style="width:72px;height:72px;object-fit:cover;border-radius:50%">
                             </div>
                             <div class="col-md-9">
                                 <h2 th:text="${user.fullname}">Họ tên</h2>
@@ -173,6 +173,15 @@
                                     <div class="col-6" th:text="${user.phone} ?: '-'">-</div>
                                     <div class="col-6 label">Địa chỉ</div>
                                     <div class="col-6" th:text="${user.address} ?: '-'">-</div>
+                                    <li class="mb-2">
+                                        <strong>Giới tính:</strong>
+                                        <span th:text="${#strings.isEmpty(user.gender) ? '-' : user.gender}">-</span>
+                                    </li>
+
+                                    <li class="mb-2">
+                                        <strong>Ngày sinh:</strong>
+                                        <span th:text="${user.dob != null ? #temporals.format(user.dob, 'dd/MM/yyyy') : '-'}">-</span>
+                                    </li>
                                 </div>
                                 <div class="mt-4 d-flex gap-2 flex-wrap">
                                     <a th:href="@{/profile/edit}" class="btn btn-primary rounded-pill px-4">Chỉnh sửa</a>

@@ -1,6 +1,7 @@
 package com.example.fruitables.controller;
 
 import com.example.fruitables.Service.CurrentUserService;
+import com.example.fruitables.Service.FileStorageService;
 import com.example.fruitables.user.User;
 import com.example.fruitables.user.UserRepository;
 import org.springframework.stereotype.Controller;
@@ -11,21 +12,22 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.*;
-import java.util.UUID;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 
 @Controller
 public class ProfileEditController {
 
     private final CurrentUserService currentUserService;
     private final UserRepository userRepository;
+    private final FileStorageService fileStorageService;
 
-    // đường dẫn thư mục lưu file ngoài project (có thể cấu hình trong application.properties)
-    private final Path uploadRoot = Paths.get("uploads/avatars");
-
-    public ProfileEditController(CurrentUserService currentUserService, UserRepository userRepository) {
+    public ProfileEditController(CurrentUserService currentUserService,
+                                 UserRepository userRepository,
+                                 FileStorageService fileStorageService) {
         this.currentUserService = currentUserService;
         this.userRepository = userRepository;
+        this.fileStorageService = fileStorageService;
     }
 
     @GetMapping("/profile/edit")
@@ -38,50 +40,50 @@ public class ProfileEditController {
 
     @PostMapping("/profile/edit")
     public String update(String fullname,
+                         String email,
                          String phone,
+                         String gender,
+                         String dob,            // yyyy-MM-dd (từ <input type="date">)
                          String address,
-                         MultipartFile avatarFile,
-                         Model model) throws IOException {
+                         MultipartFile avatarFile, // <input type="file" name="avatarFile">
+                         Model model) {
 
         User user = currentUserService.getCurrentUser()
                 .orElseThrow(() -> new RuntimeException("User chưa đăng nhập"));
 
-        // cập nhật text fields
+        // Cập nhật trường text
         if (StringUtils.hasText(fullname)) user.setFullname(fullname.trim());
+        if (StringUtils.hasText(email))   user.setEmail(email.trim());
         user.setPhone(StringUtils.hasText(phone) ? phone.trim() : null);
+        user.setGender(StringUtils.hasText(gender) ? gender.trim() : null);
         user.setAddress(StringUtils.hasText(address) ? address.trim() : null);
 
-        // xử lý upload avatar (tùy chọn)
+        // Parse ngày sinh (nếu có)
+        if (StringUtils.hasText(dob)) {
+            try {
+                user.setDob(LocalDate.parse(dob.trim())); // định dạng mặc định yyyy-MM-dd
+            } catch (DateTimeParseException ignored) {
+                // Không set nếu sai định dạng; bạn có thể add thông báo nếu muốn
+            }
+        } else {
+            user.setDob(null);
+        }
+
+        // Upload ảnh (tùy chọn)
         if (avatarFile != null && !avatarFile.isEmpty()) {
-            // đảm bảo thư mục tồn tại
-            if (!Files.exists(uploadRoot)) Files.createDirectories(uploadRoot);
-
-            String ext = OptionalExt.getExtension(avatarFile.getOriginalFilename());
-            String filename = UUID.randomUUID() + (ext.isEmpty() ? ".png" : ext);
-            Path dest = uploadRoot.resolve(filename);
-            Files.copy(avatarFile.getInputStream(), dest, StandardCopyOption.REPLACE_EXISTING);
-
-            // URL public trỏ tới ResourceHandler (mục 5.2)
-            user.setAvatarUrl("/uploads/avatars/" + filename);
+            try {
+                String url = fileStorageService.saveAvatar(avatarFile); // trả về "/uploads/avatars/xxx.png"
+                if (url != null) {
+                    user.setAvatarUrl(url);
+                }
+            } catch (IOException e) {
+                model.addAttribute("error", "Upload ảnh thất bại: " + e.getMessage());
+                model.addAttribute("user", user);
+                return "profile-edit";
+            }
         }
 
-        userRepository.save(user);
+        userRepository.save(user); // MongoDB
         return "redirect:/profile";
-    }
-
-    // helper để lấy đuôi file an toàn
-    static class OptionalExt {
-        static String getExtension(String originalName) {
-            if (!StringUtils.hasText(originalName)) return "";
-            String name = originalName.trim();
-            int i = name.lastIndexOf('.');
-            if (i < 0) return "";
-            String ext = name.substring(i).toLowerCase();
-            // chặn 1 số đuôi nguy hiểm
-            return switch (ext) {
-                case ".png", ".jpg", ".jpeg", ".webp", ".gif" -> ext;
-                default -> ".png";
-            };
-        }
     }
 }

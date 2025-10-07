@@ -59,12 +59,13 @@
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Giới tính</label>
-                            <select class="form-select" name="gender">
-                                <option th:selected="${user.gender == null || user.gender == ''}" value="">-</option>
-                                <option value="Nam" th:selected="${user.gender == 'Nam'}">Nam</option>
-                                <option value="Nữ" th:selected="${user.gender == 'Nữ'}">Nữ</option>
-                                <option value="Khác" th:selected="${user.gender == 'Khác'}">Khác</option>
+                            <select class="form-select" name="gender" th:value="${user.gender}">
+                                <option value="">-</option>
+                                <option value="Nam">Nam</option>
+                                <option value="Nữ">Nữ</option>
+                                <option value="Khác">Khác</option>
                             </select>
+
                         </div>
                     </div>
 
@@ -72,7 +73,7 @@
                         <div class="col-md-6">
                             <label class="form-label">Ngày sinh</label>
                             <input type="date" class="form-control" name="dob"
-                                   th:value="${user.dob != null ? #temporals.format(user.dob,'yyyy-MM-dd') : ''}">
+                                   th:value="${user.dob != null ? #temporals.format(user.dob, 'yyyy-MM-dd') : ''}">
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Địa chỉ</label>
@@ -83,12 +84,13 @@
                     <div class="mb-3 mt-3">
                         <label class="form-label">Ảnh đại diện</label>
                         <div class="d-flex align-items-center gap-3">
-                            <!-- Lưu ý: để tránh lỗi Elvis, đặt toàn bộ vào 1 biểu thức -->
-                            <img th:src="${user.avatarUrl != null ? user.avatarUrl : '/images/default-avatar.png'}"
+                            <!-- Xem trước ảnh: dùng đường dẫn trong DB nếu có, nếu không dùng ảnh mặc định -->
+                            <img th:src="${user.avatarUrl != null ? user.avatarUrl : '/img/avatar.png'}"
                                  class="avatar" alt="avatar">
+                            <!-- Input file: TÊN PHẢI TRÙNG CONTROLLER (avatarFile) -->
                             <input class="form-control" type="file" name="avatarFile" accept=".png,.jpg,.jpeg,.webp,.gif">
                         </div>
-                        <div class="form-text">Hỗ trợ PNG, JPG, WEBP, GIF.</div>
+                        <div class="form-text">Chấp nhận: PNG, JPG, JPEG, WEBP, GIF</div>
                     </div>
 
                     <div class="d-flex gap-2">

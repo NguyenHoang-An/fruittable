@@ -27,19 +27,22 @@ public class ProfileController {
         this.userService = userService;
         this.orderService = orderService;
     }
-
     /**
      * Trang hồ sơ với lịch sử mua hàng
      * Query param: status = ALL | CONFIRMED | SHIPPING | DELIVERED
      */
     @GetMapping("/profile")
-    public String profilePage(@RequestParam(name = "status", defaultValue = "ALL") String status,
-                              Model model) {
+    public String profile(
+            @RequestParam(name = "status", defaultValue = "ALL") String status,
+            Model model) {
 
-        User user = currentUserService.getCurrentUser().orElse(null);
-        if (user == null) {
-            return "redirect:/login";
-        }
+        // Chuẩn hoá trạng thái, chống null/rỗng rồi mới toUpperCase()
+        String effectiveStatus = (status == null || status.isBlank())
+                ? "ALL"
+                : status.trim().toUpperCase();
+
+        User user = currentUserService.getCurrentUser()
+                .orElseThrow(() -> new RuntimeException("User chưa đăng nhập"));
 
         // Nhóm trạng thái đã mua
         List<OrderStatus> purchased = List.of(
@@ -48,30 +51,27 @@ public class ProfileController {
                 OrderStatus.DELIVERED
         );
 
-        // Lấy đơn theo trạng thái (chỉ cho phép trong nhóm purchased)
+        // Lấy đơn theo trạng thái
         List<?> orders;
-        if ("ALL".equalsIgnoreCase(status)) {
+        if ("ALL".equals(effectiveStatus)) {
             orders = orderService.findOrdersOf(user.getId(), purchased);
         } else {
-            OrderStatus st;
+            OrderStatus st = null;
             try {
-                st = OrderStatus.valueOf(status.toUpperCase());
-            } catch (IllegalArgumentException ex) {
-                st = null;
-            }
+                st = OrderStatus.valueOf(effectiveStatus);
+            } catch (IllegalArgumentException ignored) { /* giữ null */ }
             if (st == null || !purchased.contains(st)) {
                 orders = orderService.findOrdersOf(user.getId(), purchased);
-                status = "ALL";
+                effectiveStatus = "ALL";
             } else {
                 orders = orderService.findOrdersOf(user.getId(), st);
             }
         }
 
-        // Bind model (sửa chính tả: "orders")
-        model.addAttribute("orders", orders);
-        model.addAttribute("status", status.toUpperCase());
         model.addAttribute("user", user);
-
+        model.addAttribute("orders", orders);
+        model.addAttribute("status", effectiveStatus);
         return "profile";
     }
+
 }
