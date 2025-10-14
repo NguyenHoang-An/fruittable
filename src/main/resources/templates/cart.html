@@ -65,7 +65,7 @@
                         <a href="#" class="nav-link dropdown-toggle active" data-bs-toggle="dropdown">Pages</a>
                         <div class="dropdown-menu m-0 bg-secondary rounded-0">
                             <a th:href="@{/cart}" class="dropdown-item active">Cart</a>
-                            <a th:href="@{/checkout}" class="dropdown-item">Checkout</a>
+                            <a th:href="@{/chackout}" class="dropdown-item">Checkout</a>
                             <a th:href="@{/testimonial}" class="dropdown-item">Testimonial</a>
                             <a th:href="@{/404}" class="dropdown-item">404 Page</a>
                         </div>
@@ -221,7 +221,7 @@
                         <h5 class="mb-0 ps-4 me-4">Total</h5>
                         <p class="mb-0 pe-4" th:text="${#numbers.formatInteger(total,0,'POINT')} + ' ₫'">0 ₫</p>
                     </div>
-                    <a th:href="@{/checkout}" class="btn border-secondary rounded-pill px-4 py-3 text-primary text-uppercase mb-4 ms-4">Proceed Checkout</a>
+                    <a th:href="@{/chackout}" class="btn border-secondary rounded-pill px-4 py-3 text-primary text-uppercase mb-4 ms-4">Proceed Checkout</a>
                 </div>
             </div>
         </div>

@@ -28,6 +28,7 @@ public class User {
     private Set<String> roles; // danh sách quyền (ROLE_*)
     private String gender;
     private LocalDate dob; // date of birth
+    private LocalDate createdAt = LocalDate.now();
 
 
     public User() {}
@@ -133,5 +134,13 @@ public class User {
 
     public void setDob(LocalDate dob) {
         this.dob = dob;
+    }
+
+    public LocalDate getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDate createdAt) {
+        this.createdAt = createdAt;
     }
 }

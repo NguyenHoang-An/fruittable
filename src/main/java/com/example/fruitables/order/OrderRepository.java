@@ -20,4 +20,6 @@ public interface OrderRepository extends MongoRepository<Order, String> {
                                                  Collection<OrderStatus> statuses,
                                                  LocalDateTime from,
                                                  LocalDateTime to);
+    long countByStatus(OrderStatus status);
+
 }

@@ -82,4 +82,21 @@ public class FileStorageService {
         return "/uploads/" + avatarSubDir + "/" + filename;
 
     }
+    public String saveTo(String subDir, MultipartFile file) throws IOException {
+        String cleanName = StringUtils.cleanPath(file.getOriginalFilename());
+        String ext = "";
+        int dot = cleanName.lastIndexOf('.');
+        if (dot >= 0) ext = cleanName.substring(dot);
+        String filename = java.util.UUID.randomUUID().toString().replace("-", "") + ext;
+
+        Path root = resolveRootDir(); // đã có sẵn trong lớp của bạn
+        Path dir = root.resolve(subDir.replaceFirst("^/+", ""));
+        ensureDir(dir);
+        Path target = dir.resolve(filename).normalize();
+        file.transferTo(target.toFile());
+
+        String sub = subDir.startsWith("/") ? subDir.substring(1) : subDir;
+        return "/uploads/" + sub + "/" + filename;
+    }
+
 }

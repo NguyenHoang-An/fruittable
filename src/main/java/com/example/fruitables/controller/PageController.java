@@ -12,22 +12,10 @@ public class PageController {
         return "index";
     }
 
-    // Trang danh sách sản phẩm
-    @GetMapping({"/shop"})
-    public String shop(){
-        return "shop";
-    }
-
     // Trang chi tiết sản phẩm
     @GetMapping({"/shop-detail"})
     public String shopDetail(){
         return "shop-detail";
-    }
-
-    // Trang thanh toán
-    @GetMapping({"/chackout"})
-    public String chackout(){
-        return "chackout";
     }
 
     // Trang liên hệ
@@ -41,5 +29,11 @@ public class PageController {
     public String notFound(){
         return "404";
     }
+
+    @GetMapping("/testimonial")
+    public String testimonial() {
+        return "testimonial"; // trỏ tới templates/testimonial.html
+    }
+
 
 }

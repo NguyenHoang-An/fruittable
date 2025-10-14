@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8"/>
+    <title th:text="${product.id} != null ? 'Sửa sản phẩm' : 'Thêm sản phẩm'">Form sản phẩm</title>
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="container py-4">
+<a class="btn btn-link mb-3" th:href="@{/admin/products}">← Quay lại danh sách</a>
+
+<h3 th:text="${product.id} != null ? 'Sửa sản phẩm' : 'Thêm sản phẩm'">Form sản phẩm</h3>
+
+<form th:action="${product.id} != null ?
+                  @{'/admin/products/' + ${product.id} + '/edit'} :
+                  @{/admin/products/create}"
+      method="post" enctype="multipart/form-data" th:object="${product}">
+
+    <div class="row g-3">
+        <!-- Tên -->
+        <div class="col-md-6">
+            <label class="form-label">Tên sản phẩm</label>
+            <input class="form-control" th:field="*{name}" placeholder="Nhập tên sản phẩm" required>
+        </div>
+
+        <!-- Giá -->
+        <div class="col-md-3">
+            <label class="form-label">Giá (VND)</label>
+            <input class="form-control" type="number" th:field="*{price}" step="1000" min="0" required>
+        </div>
+
+        <!-- Đơn vị -->
+        <div class="col-md-3">
+            <label class="form-label">Đơn vị</label>
+            <input class="form-control" th:field="*{unit}" placeholder="vd: kg, hộp, chai...">
+        </div>
+
+        <!-- Danh mục -->
+        <div class="col-md-6">
+            <label class="form-label">Danh mục</label>
+            <input class="form-control" th:field="*{category}">
+        </div>
+
+        <!-- Slug -->
+        <div class="col-md-6">
+            <label class="form-label">Slug (nếu trống sẽ tự sinh)</label>
+            <input class="form-control" th:field="*{slug}">
+        </div>
+
+        <!-- Mô tả -->
+        <div class="col-12">
+            <label class="form-label">Mô tả sản phẩm</label>
+            <textarea class="form-control" th:field="*{description}" rows="4"></textarea>
+        </div>
+
+        <!-- Ảnh -->
+        <div class="col-md-6">
+            <label class="form-label">Ảnh sản phẩm</label>
+            <input type="file" class="form-control" name="image" accept="image/*">
+            <div class="mt-2" th:if="${product.imageUrl}">
+                <img th:src="${product.imageUrl}" alt="Ảnh hiện tại" class="img-thumbnail" style="height:120px">
+            </div>
+        </div>
+
+        <!-- Hiển thị -->
+        <div class="col-md-3">
+            <label class="form-label d-block">Hiển thị</label>
+            <input class="form-check-input" type="checkbox" th:field="*{enabled}">
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <button class="btn btn-primary" type="submit">💾 Lưu</button>
+        <a class="btn btn-secondary" th:href="@{/admin/products}">Huỷ</a>
+    </div>
+</form>
+</body>
+</html>

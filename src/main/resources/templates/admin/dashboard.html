@@ -1,0 +1,66 @@
+<!doctype html xmlns:th="http://www.thymeleaf.org">
+<table class="table table-sm align-middle" xmlns:th="http://www.w3.org/1999/xhtml">
+    <thead><tr>
+        <th>Mã</th><th>Khách</th><th>Tổng</th><th>Trạng thái</th><th></th>
+    </tr></thead>
+    <tbody>
+    <tr th:each="o: ${latestOrders}">
+        <td th:text="${o.id}">#</td>
+        <td th:text="${o.customerName}">Nguyễn A</td>
+        <td th:text="${#numbers.formatDecimal(o.total,0,'COMMA',0,'POINT')}">0</td>
+        <td th:text="${o.status}">PENDING</td>
+        <td>
+            <form th:action="@{|/admin/orders/${o.id}/confirm|}" method="post"
+                  th:if="${o.status.name() == 'PENDING'}">
+                <button class="btn btn-sm btn-success">Xác nhận</button>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table>
+</div>
+</div>
+</div>
+
+
+<!-- Latest Users -->
+<div class="col-lg-5">
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Khách hàng mới</h5>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item" th:each="u: ${latestCustomers}">
+                    <div class="d-flex justify-content-between">
+                        <span th:text="${u.fullName != null ? u.fullName : u.email}">User</span>
+                        <span class="text-muted" th:text="${#dates.format(u.createdAt, 'dd/MM/yyyy')}">--/--/----</span>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const ctx = document.getElementById('revenueChart');
+    const data = {
+    labels: [],
+    datasets: [{ label: 'VND', data: [] }]
+    };
+    const chart = new Chart(ctx, { type: 'line', data });
+
+
+    // Subscribe SSE
+    const es = new EventSource('/admin/api/revenue-stream');
+    es.addEventListener('revenue', (e) => {
+    const now = new Date();
+    data.labels.push(now.toLocaleTimeString());
+    data.datasets[0].data.push(Number(e.data));
+    if (data.labels.length > 20) { data.labels.shift(); data.datasets[0].data.shift(); }
+    chart.update();
+    });
+</script>
+</body>
+</html>

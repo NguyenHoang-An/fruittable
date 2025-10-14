@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8"/>
+    <title>Quản lý sản phẩm</title>
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="container py-4">
+<h3 class="mb-3">Quản lý sản phẩm</h3>
+<a class="btn btn-success mb-3" th:href="@{/admin/products/create}">+ Thêm sản phẩm</a>
+
+<table class="table table-bordered align-middle">
+    <thead class="table-light">
+    <tr>
+        <th>Ảnh</th>
+        <th>Tên</th>
+        <th>Giá</th>
+        <th>Đơn vị</th>
+        <th>Danh mục</th>
+        <th>Hiển thị</th>
+        <th style="width:180px"></th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="p : ${items}">
+        <td>
+            <img th:if="${p.imageUrl}" th:src="${p.imageUrl}" alt="" style="height:60px">
+        </td>
+        <td th:text="${p.name}">Táo đỏ Fuji</td>
+        <td th:text="${#numbers.formatDecimal(p.price, 0, 'COMMA', 0, 'POINT')}">120000</td>
+        <td th:text="${p.unit}">kg</td>
+        <td th:text="${p.category}">Trái cây</td>
+        <td>
+          <span class="badge" th:classappend="${p.enabled} ? 'bg-success' : 'bg-secondary'"
+                th:text="${p.enabled} ? 'Bật' : 'Tắt'">Bật</span>
+        </td>
+        <td>
+            <a class="btn btn-sm btn-primary" th:href="@{|/admin/products/${p.id}/edit|}">Sửa</a>
+            <form th:action="@{|/admin/products/${p.id}/delete|}" method="post" style="display:inline"
+                  onsubmit="return confirm('Xoá sản phẩm này?')">
+                <button class="btn btn-sm btn-danger" type="submit">Xoá</button>
+            </form>
+            <a class="btn btn-sm btn-outline-secondary" th:href="@{|/shop-detail/${p.id}|}" target="_blank">Xem</a>
+        </td>
+    </tr>
+    </tbody>
+</table>
+<!-- Toast thông báo -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+    <div th:if="${param.created}" class="toast align-items-center text-bg-success border-0 show" role="alert">
+        <div class="d-flex">
+            <div class="toast-body">✅ Sản phẩm đã được <strong>thêm</strong> thành công!</div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    </div>
+    <div th:if="${param.updated}" class="toast align-items-center text-bg-info border-0 show" role="alert">
+        <div class="d-flex">
+            <div class="toast-body">✏️ Sản phẩm đã được <strong>cập nhật</strong>!</div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    </div>
+    <div th:if="${param.deleted}" class="toast align-items-center text-bg-warning border-0 show" role="alert">
+        <div class="d-flex">
+            <div class="toast-body">🗑️ Sản phẩm đã được <strong>xóa</strong>!</div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    </div>
+</div>
+
+<script src="/js/bootstrap.bundle.min.js"></script>
+<script>
+    const toastElList = document.querySelectorAll('.toast');
+    toastElList.forEach(toastEl => {
+      const toast = new bootstrap.Toast(toastEl, { delay: 3000 });
+      toast.show();
+    });
+</script>
+</body>
+</html>

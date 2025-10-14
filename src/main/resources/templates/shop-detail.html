@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en"  xmlns:th="http://www.thymeleaf.org">
+<html lang="en"  xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
     <head>
         <meta charset="utf-8">
@@ -97,16 +97,16 @@
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-end shadow">
                                     <!-- Chưa đăng nhập -->
-                                    <li th:if="${#httpServletRequest.userPrincipal == null}">
+                                    <li sec:authorize="isAnonymous()">
                                         <a class="dropdown-item" th:href="@{/login}">Đăng nhập</a>
                                     </li>
 
                                     <!-- Đã đăng nhập -->
-                                    <li th:if="${#httpServletRequest.userPrincipal != null}">
+                                    <li sec:authorize="isAuthenticated()">
                                         <a class="dropdown-item" th:href="@{/profile}">Trang cá nhân</a>
                                     </li>
-                                    <li th:if="${#httpServletRequest.userPrincipal != null}"><hr class="dropdown-divider"></li>
-                                    <li th:if="${#httpServletRequest.userPrincipal != null}">
+                                    <li sec:authorize="isAuthenticated()"><hr class="dropdown-divider"></li>
+                                    <li sec:authorize="isAuthenticated()">
                                         <form th:action="@{/logout}" method="post">
                                             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
                                             <button type="submit" class="dropdown-item">Đăng xuất</button>

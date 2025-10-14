@@ -53,9 +53,10 @@ public class SecurityConfig {
 
                 // Phân quyền truy cập
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/index", "/home", "/shop", "/shop-detail", "/login", "/register", "/css/**", "/js/**", "/lib/**", "/img/**", "/images/**", "/fonts/**","/uploads/**","/cart","/cart/**")
+                        .requestMatchers("/", "/index", "/home", "/shop", "/shop-detail", "/login", "/register", "/css/**", "/js/**", "/lib/**", "/img/**", "/images/**", "/fonts/**","/uploads/**","/cart","/cart/**","/404","/testimonial","/contact")
                         .permitAll()  // Cho phép truy cập công khai
                         .requestMatchers("/profile","/profile/edit","/api/me").authenticated()
+                        .requestMatchers("/admin/**").hasRole("ADMIN") // Chỉ admin mới được vào /admin/**
                         .anyRequest().authenticated()  // Còn lại yêu cầu đăng nhập
                 )
                 // Cấu hình trang đăng nhập
