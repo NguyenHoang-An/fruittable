@@ -6,17 +6,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 // Controller trả về các trang tĩnh (thymeleaf templates)
 @Controller
 public class PageController {
-    // Trang chủ
-    @GetMapping({"/","/index","/home"})
-    public String index(){
-        return "index";
-    }
-
-    // Trang chi tiết sản phẩm
-    @GetMapping({"/shop-detail"})
-    public String shopDetail(){
-        return "shop-detail";
-    }
 
     // Trang liên hệ
     @GetMapping({"/contact"})

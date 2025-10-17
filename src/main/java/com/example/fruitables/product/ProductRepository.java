@@ -8,4 +8,5 @@ import java.util.Optional;
 public interface ProductRepository extends MongoRepository<Product, String> {
     Optional<Product> findByslug(String slug);
     List<Product> findByEnabledTrue();
+    List<Product> findByCategoryIgnoreCase(String category);
 }

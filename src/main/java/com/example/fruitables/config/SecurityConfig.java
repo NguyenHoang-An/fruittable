@@ -27,7 +27,7 @@ public class SecurityConfig {
 
     // Bộ mã hoá mật khẩu dùng BCrypt
     @Bean
-    PasswordEncoder passwordEncoder() {
+    public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 

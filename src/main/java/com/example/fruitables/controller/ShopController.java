@@ -16,13 +16,6 @@ public class ShopController {
         this.productService = productService;
     }
 
-    //Trang danh sách (shop)
-    @GetMapping("/shop")
-    public String shop(Model model){
-        model.addAttribute("products", productService.listActive());
-        return "shop";
-    }
-
     //Trang chi tiết sản phẩm
     @GetMapping("/shop-detail/{id}")
     public String detailById(@PathVariable String id, Model model){

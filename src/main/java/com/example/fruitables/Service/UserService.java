@@ -27,17 +27,24 @@ public class UserService implements UserDetailsService {
 
     // Tải thông tin user cho Spring Security từ username
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User u = repo.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+    public UserDetails loadUserByUsername(String loginInput) throws UsernameNotFoundException {
+        // Tìm theo username trước, nếu không có thì thử tìm theo email
+        Optional<User> userOpt = repo.findByUsername(loginInput);
 
-        return new org.springframework.security.core.userdetails.User(
-                u.getUsername(),
-                u.getPassword(),
-                u.isEnabled(),
-                true, true, true,
-                u.getRoles().stream().map(SimpleGrantedAuthority::new).collect(Collectors.toSet())
-        );
+        if (userOpt.isEmpty()) {
+            userOpt = repo.findByEmail(loginInput);
+        }
+
+        User user = userOpt.orElseThrow(() ->
+                new UsernameNotFoundException("Không tìm thấy tài khoản: " + loginInput));
+
+        // Trả về đối tượng UserDetails
+        return org.springframework.security.core.userdetails.User.builder()
+                .username(user.getUsername()) // hoặc user.getEmail(), tuỳ cấu trúc
+                .password(user.getPassword())
+                .roles(user.getRoles().toArray(new String[0]))
+                .disabled(!user.isEnabled())
+                .build();
     }
 
     // Đăng ký người dùng mới: validate, mã hoá mật khẩu, gán quyền, lưu DB
