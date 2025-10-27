@@ -17,13 +17,9 @@ import org.springframework.security.web.SecurityFilterChain;
 // Cấu hình bảo mật Spring Security cho ứng dụng
 public class SecurityConfig {
 
-    private final UserService userService;
-
-    // Inject qua constructor (giúp test tốt hơn và tránh circular dependency)
     @Autowired
-    public SecurityConfig(@Lazy UserService userService) {
-        this.userService = userService;
-    }
+    @Lazy
+    private UserService userService;
 
     // Bộ mã hoá mật khẩu dùng BCrypt
     @Bean
@@ -33,7 +29,7 @@ public class SecurityConfig {
 
     // Provider xác thực sử dụng UserService + PasswordEncoder
     @Bean
-    DaoAuthenticationProvider authProvider() {
+    public DaoAuthenticationProvider authProvider() {
         DaoAuthenticationProvider p = new DaoAuthenticationProvider();
         p.setUserDetailsService(userService);
         p.setPasswordEncoder(passwordEncoder());
@@ -42,50 +38,67 @@ public class SecurityConfig {
 
     // Chuỗi filter chính của Spring Security
     @Bean
-    SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                // CSRF: bỏ qua cho các endpoint tĩnh và trang public
+                // ✅ CSRF: bỏ qua cho các trang public và tài nguyên tĩnh
                 .csrf(csrf -> csrf
-                        .ignoringRequestMatchers("/login", "/register", "/css/**", "/js/**", "/lib/**", "/img/**", "/images/**", "/fonts/**"))
+                        .ignoringRequestMatchers(
+                                "/login", "/register",
+                                "/css/**", "/js/**", "/lib/**", "/img/**", "/images/**", "/fonts/**",
+                                "/uploads/**", "/api/**"
+                        )
+                )
 
-                // Provider xác thực tuỳ chỉnh
+                // ✅ Provider xác thực
                 .authenticationProvider(authProvider())
 
-                // Phân quyền truy cập
+                // ✅ Phân quyền truy cập
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/index", "/home", "/shop", "/shop-detail", "/login", "/register", "/css/**", "/js/**", "/lib/**", "/img/**", "/images/**", "/fonts/**","/uploads/**","/cart","/cart/**","/404","/testimonial","/contact")
-                        .permitAll()  // Cho phép truy cập công khai
-                        .requestMatchers("/profile","/profile/edit","/api/me").authenticated()
-                        .requestMatchers("/admin/**").hasRole("ADMIN") // Chỉ admin mới được vào /admin/**
-                        .anyRequest().authenticated()  // Còn lại yêu cầu đăng nhập
+                        .requestMatchers(
+                                "/", "/index", "/home", "/shop", "/shop-detail",
+                                "/login", "/register", "/css/**", "/js/**", "/lib/**",
+                                "/img/**", "/images/**", "/fonts/**", "/uploads/**",
+                                "/cart", "/cart/**", "/404", "/testimonial", "/contact"
+                        ).permitAll()
+                        .requestMatchers("/profile", "/profile/edit", "/api/me").authenticated()
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .anyRequest().authenticated()
                 )
-                // Cấu hình trang đăng nhập
+
+                // ✅ Form login
                 .formLogin(login -> login
                         .loginPage("/login")
                         .loginProcessingUrl("/login")
-                        .defaultSuccessUrl("/", true)
-                        .defaultSuccessUrl("/profile", true)
+                        .usernameParameter("login")
+                        .passwordParameter("password")
+                        .successHandler((request, response, authentication) -> {
+                            // Chuyển hướng sau khi đăng nhập thành công
+                            var roles = authentication.getAuthorities().toString();
+                            if (roles.contains("ROLE_ADMIN")) {
+                                response.sendRedirect("/admin/dashboard");
+                            } else {
+                                response.sendRedirect("/profile");
+                            }
+                        })
                         .failureUrl("/login?error")
                         .permitAll()
                 )
-                // Đăng xuất
+
+                // ✅ Logout
                 .logout(logout -> logout
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/login?logout")
                         .permitAll()
                 )
-                // Ghi nhớ đăng nhập (remember-me)
+
+                // ✅ Remember me
                 .rememberMe(rememberMe -> rememberMe
                         .key("uniqueAndSecret")
-                        .tokenValiditySeconds(86400)
+                        .tokenValiditySeconds(86400) // 1 ngày
                         .rememberMeParameter("remember-me")
-                )
-                // CSRF: KHÔNG ignore /register (để buộc phải có token)
-                .csrf(csrf -> csrf
-                        .ignoringRequestMatchers("/api/**") // nếu có API thuần JSON
                 );
-
         return http.build();
     }
+
 }
 

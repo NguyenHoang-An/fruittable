@@ -39,7 +39,7 @@ public class ProfileEditController {
     }
 
     @PostMapping("/profile/edit")
-    public String update(String fullname,
+    public String update(String fullName,
                          String email,
                          String phone,
                          String gender,
@@ -52,7 +52,7 @@ public class ProfileEditController {
                 .orElseThrow(() -> new RuntimeException("User chưa đăng nhập"));
 
         // Cập nhật trường text
-        if (StringUtils.hasText(fullname)) user.setFullname(fullname.trim());
+        if (StringUtils.hasText(fullName)) user.setFullName(fullName.trim());
         if (StringUtils.hasText(email))   user.setEmail(email.trim());
         user.setPhone(StringUtils.hasText(phone) ? phone.trim() : null);
         user.setGender(StringUtils.hasText(gender) ? gender.trim() : null);

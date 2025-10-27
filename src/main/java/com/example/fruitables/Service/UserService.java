@@ -19,18 +19,16 @@ public class UserService implements UserDetailsService {
     private final PasswordEncoder encoder;
 
     // Inject repository và password encoder
-    @Autowired
     public UserService(UserRepository repo, PasswordEncoder encoder) {
         this.repo = repo;
         this.encoder = encoder;
     }
 
-    // Tải thông tin user cho Spring Security từ username
+    // ✅ Tải thông tin user cho Spring Security từ username hoặc email
     @Override
     public UserDetails loadUserByUsername(String loginInput) throws UsernameNotFoundException {
-        // Tìm theo username trước, nếu không có thì thử tìm theo email
+        // Tìm user theo username, nếu không có thì tìm theo email
         Optional<User> userOpt = repo.findByUsername(loginInput);
-
         if (userOpt.isEmpty()) {
             userOpt = repo.findByEmail(loginInput);
         }
@@ -38,17 +36,28 @@ public class UserService implements UserDetailsService {
         User user = userOpt.orElseThrow(() ->
                 new UsernameNotFoundException("Không tìm thấy tài khoản: " + loginInput));
 
-        // Trả về đối tượng UserDetails
+        // ✅ Nếu username bị null, fallback sang email
+        String principal = user.getUsername() != null ? user.getUsername() : user.getEmail();
+        if (principal == null) {
+            throw new UsernameNotFoundException("Tài khoản không có username/email hợp lệ: " + loginInput);
+        }
+
+        // ✅ Trả về UserDetails hợp lệ cho Spring Security
         return org.springframework.security.core.userdetails.User.builder()
-                .username(user.getUsername()) // hoặc user.getEmail(), tuỳ cấu trúc
+                .username(principal)
                 .password(user.getPassword())
-                .roles(user.getRoles().toArray(new String[0]))
+                .authorities(
+                        user.getRoles().stream()
+                                .map(r -> r.startsWith("ROLE_") ? r : "ROLE_" + r)
+                                .map(SimpleGrantedAuthority::new)
+                                .collect(Collectors.toList())
+                )
                 .disabled(!user.isEnabled())
                 .build();
     }
 
-    // Đăng ký người dùng mới: validate, mã hoá mật khẩu, gán quyền, lưu DB
-    public void register(String fullname, String email, String username, String rawPassword) {
+    // ✅ Đăng ký người dùng mới: validate, mã hoá mật khẩu, gán quyền, lưu DB
+    public void register(String fullName, String email, String username, String rawPassword) {
         System.out.println(">> [REGISTER] Request username=" + username + ", email=" + email);
 
         if (repo.existsByUsername(username)) {
@@ -61,17 +70,16 @@ public class UserService implements UserDetailsService {
         }
 
         User u = new User();
-        u.setFullname(fullname);
+        u.setFullName(fullName);
         u.setEmail(email);
         u.setUsername(username);
         u.setPassword(encoder.encode(rawPassword));
 
-        // Sửa đúng chuẩn ROLE_
+        // Gán quyền mặc định cho người dùng mới
         u.setRoles(Set.of("ROLE_USER"));
 
         User saved = repo.save(u);
         System.out.println(">> [REGISTER] Created user id=" + saved.getId()
                 + ", username=" + saved.getUsername() + ", email=" + saved.getEmail());
     }
-
 }

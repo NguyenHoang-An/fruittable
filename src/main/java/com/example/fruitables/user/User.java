@@ -14,7 +14,7 @@ public class User {
     @Id
     private String id;
 
-    private String fullname;
+    private String fullName;
     // Ràng buộc validate cơ bản
     @NotNull(message = "Username cannot be null")
     private String username;
@@ -48,12 +48,12 @@ public class User {
         this.id = id;
     }
 
-    public String getFullname() {
-        return fullname;
+    public String getFullName() {
+        return fullName;
     }
 
-    public void setFullname(String fullname) {
-        this.fullname = fullname;
+    public void setFullName(String fullname) {
+        this.fullName = fullname;
     }
 
     public String getUsername() {

@@ -1,8 +1,10 @@
 package com.example.fruitables.product;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -24,6 +26,8 @@ public class Product {
     private boolean enabled = true; // bật/tắt hiển thị
     private Instant createdAt = Instant.now(); // thời gian tạo
     private Instant updatedAt = Instant.now(); // thời gian cập nhật
+    @Transient
+    private MultipartFile imageFile; // file ảnh upload
 
     // getters, setters
 
@@ -113,5 +117,13 @@ public class Product {
 
     public void setUpdatedAt(Instant updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public MultipartFile getImageFile() {
+        return imageFile;
+    }
+
+    public void setImageFile(MultipartFile imageFile) {
+        this.imageFile = imageFile;
     }
 }

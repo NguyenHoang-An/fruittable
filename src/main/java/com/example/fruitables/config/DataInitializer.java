@@ -18,7 +18,7 @@ public class DataInitializer {
             users.findByEmail(adminEmail).orElseGet(() -> {
                 User u = new User();
                 u.setEmail(adminEmail);
-                u.setFullname("Administrator");
+                u.setFullName("Administrator");
                 u.setPassword(new BCryptPasswordEncoder().encode("Admin@123"));
                 u.setRoles(Set.of("ROLE_ADMIN")); // hoặc set<Enum> tùy model của bạn
                 u.setEnabled(true);

@@ -1,79 +1,59 @@
-<!doctype html>
-<html lang="vi" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="utf-8"/>
-    <title>Quản lý sản phẩm</title>
-    <link href="/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body class="container py-4">
-<h3 class="mb-3">Quản lý sản phẩm</h3>
-<a class="btn btn-success mb-3" th:href="@{/admin/products/create}">+ Thêm sản phẩm</a>
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi"
+      th:replace="layout-admin :: layout(~{::body})">
+<body>
 
-<table class="table table-bordered align-middle">
-    <thead class="table-light">
-    <tr>
-        <th>Ảnh</th>
-        <th>Tên</th>
-        <th>Giá</th>
-        <th>Đơn vị</th>
-        <th>Danh mục</th>
-        <th>Hiển thị</th>
-        <th style="width:180px"></th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="p : ${items}">
-        <td>
-            <img th:if="${p.imageUrl}" th:src="${p.imageUrl}" alt="" style="height:60px">
-        </td>
-        <td th:text="${p.name}">Táo đỏ Fuji</td>
-        <td th:text="${#numbers.formatDecimal(p.price, 0, 'COMMA', 0, 'POINT')}">120000</td>
-        <td th:text="${p.unit}">kg</td>
-        <td th:text="${p.category}">Trái cây</td>
-        <td>
-          <span class="badge" th:classappend="${p.enabled} ? 'bg-success' : 'bg-secondary'"
-                th:text="${p.enabled} ? 'Bật' : 'Tắt'">Bật</span>
-        </td>
-        <td>
-            <a class="btn btn-sm btn-primary" th:href="@{|/admin/products/${p.id}/edit|}">Sửa</a>
-            <form th:action="@{|/admin/products/${p.id}/delete|}" method="post" style="display:inline"
-                  onsubmit="return confirm('Xoá sản phẩm này?')">
-                <button class="btn btn-sm btn-danger" type="submit">Xoá</button>
-            </form>
-            <a class="btn btn-sm btn-outline-secondary" th:href="@{|/shop-detail/${p.id}|}" target="_blank">Xem</a>
-        </td>
-    </tr>
-    </tbody>
-</table>
-<!-- Toast thông báo -->
-<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
-    <div th:if="${param.created}" class="toast align-items-center text-bg-success border-0 show" role="alert">
-        <div class="d-flex">
-            <div class="toast-body">✅ Sản phẩm đã được <strong>thêm</strong> thành công!</div>
-            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-        </div>
+<main class="container admin-section">
+    <!-- TIÊU ĐỀ -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-success">📦 Danh sách sản phẩm</h2>
+        <a th:href="@{/admin/products/new}" class="btn btn-success">
+            <i class="fa fa-plus me-1"></i> Thêm sản phẩm
+        </a>
     </div>
-    <div th:if="${param.updated}" class="toast align-items-center text-bg-info border-0 show" role="alert">
-        <div class="d-flex">
-            <div class="toast-body">✏️ Sản phẩm đã được <strong>cập nhật</strong>!</div>
-            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-        </div>
-    </div>
-    <div th:if="${param.deleted}" class="toast align-items-center text-bg-warning border-0 show" role="alert">
-        <div class="d-flex">
-            <div class="toast-body">🗑️ Sản phẩm đã được <strong>xóa</strong>!</div>
-            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-        </div>
-    </div>
-</div>
 
-<script src="/js/bootstrap.bundle.min.js"></script>
-<script>
-    const toastElList = document.querySelectorAll('.toast');
-    toastElList.forEach(toastEl => {
-      const toast = new bootstrap.Toast(toastEl, { delay: 3000 });
-      toast.show();
-    });
-</script>
+    <!-- BẢNG SẢN PHẨM -->
+    <div class="card admin-card">
+        <div class="card-body table-responsive">
+            <table class="table table-striped align-middle">
+                <thead class="table-success">
+                <tr>
+                    <th>#</th>
+                    <th>Tên sản phẩm</th>
+                    <th>Giá</th>
+                    <th>Danh mục</th>
+                    <th>Hình ảnh</th>
+                    <th class="text-center">Hành động</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="p, stat : ${products}">
+                    <td th:text="${stat.count}">1</td>
+                    <td th:text="${p.name}">Táo Fuji</td>
+                    <td th:text="${#numbers.formatDecimal(p.price,0,'COMMA',0,'POINT')}">100000</td>
+                    <td th:text="${p.category}">Trái cây</td>
+                    <td>
+                        <img th:src="@{${p.imageUrl}}" alt="Ảnh sản phẩm" width="60"
+                             class="rounded shadow-sm">
+                    </td>
+                    <td class="text-center">
+                        <a th:href="@{'/admin/products/edit/' + ${p.id}}" class="btn btn-outline-primary btn-sm me-1">
+                            <i class="fa fa-edit"></i>
+                        </a>
+                        <a th:href="@{'/admin/products/delete/' + ${p.id}}" class="btn btn-outline-danger btn-sm"
+                           onclick="return confirm('Xóa sản phẩm này?')">
+                            <i class="fa fa-trash"></i>
+                        </a>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(products)}">
+                    <td colspan="6" class="text-center text-muted">Chưa có sản phẩm nào.</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+
 </body>
 </html>

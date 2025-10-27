@@ -3,6 +3,7 @@ package com.example.fruitables.admin;
 
 import com.example.fruitables.order.Order;
 import com.example.fruitables.order.OrderService;
+import com.example.fruitables.product.Product;
 import com.example.fruitables.user.User;
 import com.example.fruitables.user.UserRepository;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -53,6 +54,14 @@ public class AdminDashboardController {
         model.addAttribute("latestOrders", latestOrders);
         model.addAttribute("latestCustomers", latestCustomers);
         return "admin/dashboard";
+    }
+
+    @GetMapping("/products/new")
+    public String productForm(Model model) {
+        model.addAttribute("page", "products");
+        model.addAttribute("pageTitle", "Thêm sản phẩm");
+        model.addAttribute("product", new Product());
+        return "admin/product-form";
     }
 
 

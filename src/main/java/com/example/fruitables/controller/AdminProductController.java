@@ -28,7 +28,7 @@ public class AdminProductController {
 
     @GetMapping
     public String list(Model model) {
-        model.addAttribute("items", productService.listAll());
+        model.addAttribute("products", productService.listAll());
         return "admin/product-list";
     }
 
